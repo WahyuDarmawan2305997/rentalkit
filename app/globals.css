@@ -1,26 +1,217 @@
 @import "tailwindcss";
 
+/* ── Design Tokens ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette: Slate neutrals + Emerald accent */
+  --bg:          #f8fafc;
+  --bg-card:     #ffffff;
+  --bg-muted:    #f1f5f9;
+  --fg:          #0f172a;
+  --fg-muted:    #475569;
+  --fg-subtle:   #94a3b8;
+  --border:      #e2e8f0;
+  --accent:      #059669;        /* emerald-600 */
+  --accent-light:#d1fae5;        /* emerald-100 */
+  --accent-dark: #047857;        /* emerald-700 */
+  --accent-fg:   #ffffff;
+
+  /* Shape scale: 12px cards / 8px inputs / 999px buttons */
+  --r-card:    12px;
+  --r-input:   8px;
+  --r-btn:     999px;
+
+  /* Shadow */
+  --shadow-card: 0 1px 3px 0 rgb(15 23 42 / 0.06), 0 4px 12px -2px rgb(15 23 42 / 0.06);
+  --shadow-hover: 0 4px 16px -4px rgb(5 150 105 / 0.18), 0 1px 3px 0 rgb(15 23 42 / 0.08);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-med:  250ms;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg:           var(--bg);
+  --color-bg-card:      var(--bg-card);
+  --color-bg-muted:     var(--bg-muted);
+  --color-fg:           var(--fg);
+  --color-fg-muted:     var(--fg-muted);
+  --color-fg-subtle:    var(--fg-subtle);
+  --color-border:       var(--border);
+  --color-accent:       var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark:  var(--accent-dark);
+  --color-accent-fg:    var(--accent-fg);
+  --font-sans:          var(--font-geist-sans);
+  --font-mono:          var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Base Reset ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans, 'Geist', system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+img { display: block; }
+a { color: inherit; text-decoration: none; }
+
+/* ── Utility: focus ring ── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Scrollbar subtle ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ── Animation helpers ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+
+.animate-fade-up   { animation: fadeUp  0.5s var(--ease-out) both; }
+.animate-fade-in   { animation: fadeIn  0.4s var(--ease-out) both; }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+
+/* ── Skeleton loader ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-muted) 25%, var(--border) 50%, var(--bg-muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--r-input);
+}
+
+/* ── Global interaction classes (used across Server + Client components) ── */
+
+/* Product card */
+.product-card:hover {
+  box-shadow: 0 8px 24px -6px rgb(5 150 105 / 0.20), 0 2px 6px -2px rgb(15 23 42 / 0.08);
+  transform: translateY(-3px);
+  border-color: rgba(5, 150, 105, 0.35) !important;
+}
+.product-card:hover .card-img {
+  transform: scale(1.04);
+}
+.product-card:active {
+  transform: scale(0.99);
+}
+
+/* Category card */
+.cat-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.cat-card:active {
+  transform: scale(0.98);
+}
+
+/* Footer links */
+.footer-link:hover {
+  color: #e2e8f0;
+}
+
+/* Outline button */
+.btn-outline:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+/* Green CTA */
+.cta-green:hover {
+  background: #047857 !important;
+}
+
+/* Nav link hover (light bg) */
+.nav-link:hover {
+  background: var(--bg-muted);
+  color: var(--fg);
+}
+
+/* Nav link hover (dark bg — Navbar baru) */
+.nav-link-dark:hover {
+  background: rgba(248, 250, 252, 0.08);
+  color: #f8fafc;
+}
+
+/* Tombol CTA di Navbar gelap */
+.btn-nav-cta:hover {
+  background: var(--accent-dark);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.3);
+}
+
+/* Primary button hover */
+.btn-primary:hover {
+  background: var(--accent-dark);
+}
+
+/* Accent button hover */
+.btn-accent:hover {
+  background: var(--accent-dark) !important;
+}
+
+/* Step arrow on large screens */
+@media (min-width: 1024px) {
+  .step-arrow {
+    display: flex !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Responsive layouts ── */
+@media (max-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-visual {
+    height: 260px;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr !important;
+  }
+  .hero-copy {
+    padding: 3rem 1.5rem 2rem !important;
+  }
+  .sewakan-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+  .sewakan-visual {
+    order: -1;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Accessibility ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
